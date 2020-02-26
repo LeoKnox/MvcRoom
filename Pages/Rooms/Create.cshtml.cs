@@ -31,15 +31,19 @@ namespace MvcRoom
         // more details see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
+            var emptyRoom = new Room();
+
+            if (await TryUpdateModelAsync<Room>(emptyRoom,
+                "room",
+                r => r.Name, r => r.Length, r => r.Width))
             {
-                return Page();
+                _context.Room.Add(emptyRoom);
+                await _context.SaveChangesAsync();
+
+                return RedirectToPage("./Index");
             }
 
-            _context.Room.Add(Room);
-            await _context.SaveChangesAsync();
-
-            return RedirectToPage("./Index");
+            return Page();
         }
     }
 }
