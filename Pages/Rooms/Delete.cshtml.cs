@@ -12,29 +12,38 @@ namespace MvcRoom
 {
     public class DeleteModel : PageModel
     {
-        private readonly MvcRoom.Data.MvcRoomContext _context;
+        private readonly MvcRoomContext _context;
 
-        public DeleteModel(MvcRoom.Data.MvcRoomContext context)
+        public DeleteModel(MvcRoomContext context)
         {
             _context = context;
         }
 
         [BindProperty]
         public Room Room { get; set; }
+        public string ErrorMessage { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public async Task<IActionResult> OnGetAsync(int? id, bool? saveChangesError = false)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            Room = await _context.Room.FirstOrDefaultAsync(m => m.ID == id);
+            Room = await _context.Room
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == id);
 
             if (Room == null)
             {
                 return NotFound();
             }
+
+            if (saveChangesError.GetValueOrDefault())
+            {
+                ErrorMessage = "Delete failed.Try again";
+            }
+
             return Page();
         }
 
@@ -45,15 +54,23 @@ namespace MvcRoom
                 return NotFound();
             }
 
-            Room = await _context.Room.FindAsync(id);
+            var room = await _context.Room.FindAsync(id);
 
-            if (Room != null)
+            if (room == null)
             {
-                _context.Room.Remove(Room);
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
 
-            return RedirectToPage("./Index");
+            try
+            {
+                _context.Room.Remove(room);
+                await _context.SaveChangesAsync();
+                return RedirectToPage("./Index");
+            }
+            catch (DbUpdateException)
+            {
+                return RedirectToAction("./Delete", new { id, saveChangesError = true });
+            }
         }
     }
 }
