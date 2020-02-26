@@ -30,7 +30,8 @@ namespace MvcRoom
                 return NotFound();
             }
 
-            Room = await _context.Room.FirstOrDefaultAsync(m => m.ID == id);
+            //Room = await _context.Room.FirstOrDefaultAsync(m => m.ID == id);
+            Room = await _context.Room.FindAsync(id);
 
             if (Room == null)
             {
@@ -41,32 +42,25 @@ namespace MvcRoom
 
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(int id)
         {
-            if (!ModelState.IsValid)
+            var roomToUpdate = await _context.Room.FindAsync(id);
+
+            if (roomToUpdate == null)
             {
-                return Page();
+                return NotFound();
             }
 
-            _context.Attach(Room).State = EntityState.Modified;
-
-            try
+            if (await TryUpdateModelAsync<Room>(
+                roomToUpdate,
+                "room",
+                s => s.Name, s => s.Length, s => s.Width))
             {
                 await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RoomExists(Room.ID))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return RedirectToPage("./Index");
             }
 
-            return RedirectToPage("./Index");
+            return Page();
         }
 
         private bool RoomExists(int id)
