@@ -25,12 +25,19 @@ namespace MvcRoom
 
         public IList<Room> Room { get;set; }
 
-        public async Task OnGetAsync(string sortOrder)
+        public async Task OnGetAsync(string sortOrder, string searchString)
         {
             NameSort = String.IsNullOrEmpty(sortOrder) ? "name_des" : "";
 
+            CurrentFilter = searchString;
+
             IQueryable<Room> roomsIQ = from r in _context.Room
                                        select r;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                roomsIQ = roomsIQ.Where(r => r.Name.Contains(searchString) || r.Name.Contains(searchString));
+            }
 
             switch (sortOrder)
             {
