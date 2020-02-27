@@ -25,7 +25,8 @@
     <thead>
         <tr>
             <th>
-                <a asp-page="./Index" asp-route-sortOrder="@Model.NameSort">
+                <a asp-page="./Index" asp-route-sortOrder="@Model.NameSort"
+                    asp-route-currentFilter="@Model.CurrentFilter">Go
                     @Html.DisplayNameFor(model => model.Room[0].Name)
                 </a>
             </th>
@@ -59,3 +60,23 @@
 }
     </tbody>
 </table>
+
+@{ 
+    var prevDisabled = !Model.Room.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.Room.HasNextPage ? "disabled" : "";
+}
+
+<a asp-page="./Index"
+   asp-route-sortOrder="@Model.CurrentSort"
+   asp-route-pageIndex="@(Model.Room.PageIndex -1)"
+   asp-route-currentFilter="@Model.CurrentFilter"
+   class="btn btn-primary @prevDisabled">
+    Previous
+</a>
+<a asp-page="./Index"
+   asp-route-sortOrder="@Model.CurrentSort"
+   asp-route-pageIndex="@(Model.Room.PageIndex +1)"
+   asp-route-currentFilter="@Model.CurrentFilter"
+   class="btn btn-primary @nextDisabled">
+    Next
+</a>

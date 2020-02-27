@@ -23,11 +23,22 @@ namespace MvcRoom
         public string CurrentFilter { get; set; }
         public string CurrentSort { get; set; }
 
-        public IList<Room> Room { get;set; }
+        // public IList<Room> Room { get;set; }
+        public paginatedList<Room> Room { get; set; }
 
-        public async Task OnGetAsync(string sortOrder, string searchString)
+        public async Task OnGetAsync(string sortOrder, string currentFilter, string searchString, int? pageIndex)
         {
+            CurrentSort = sortOrder;
             NameSort = String.IsNullOrEmpty(sortOrder) ? "name_des" : "";
+
+            if (searchString != null)
+            {
+                pageIndex = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
 
             CurrentFilter = searchString;
 
@@ -49,7 +60,10 @@ namespace MvcRoom
                     break;
             }
 
-            Room = await roomsIQ.AsNoTracking().ToListAsync();
+            // Room = await roomsIQ.AsNoTracking().ToListAsync();
+            int pageSize = 3;
+            Room = await paginatedList<Room>.CreateAsync(
+                roomsIQ.AsNoTracking(), pageIndex ?? 1, pageSize);
         }
     }
 }
