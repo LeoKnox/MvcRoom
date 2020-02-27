@@ -1,0 +1,31 @@
+﻿@page
+@model MvcRoom.Pages.AboutModel
+
+@{
+    ViewData["Title"] = "Room Statics";
+}
+
+<h2>Room Statistics</h2>
+
+<table>
+    <tr>
+        <th>
+            Room Height
+        </th>
+        <th>
+            Rooms
+        </th>
+    </tr>
+
+    @foreach (var item in Model.Room)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.RoomHeight)
+            </td>
+            <td>
+                @item.RoomCount
+            </td>
+        </tr>
+    }
+</table>
