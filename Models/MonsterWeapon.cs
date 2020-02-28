@@ -11,5 +11,6 @@ namespace MvcRoom.Models
         public string MonsterWeaponName { get; set; }
         public string WeaponType { get; set; }
         public int Damage { get; set; }
+        public int MonsterID { get; set; }
     }
 }
